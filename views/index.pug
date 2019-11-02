@@ -5,7 +5,7 @@ block content
     h1= title
     p URL Shortener Microservice
     hr
-      form(method="POST" , action="api/shorturl/new").url_form
-          label.form_label http(s)://
-          input(type="text", placeholder="your url here...", name='url', required).form-control
-          button.btn Add 
+    form(method="POST" , action="api/shorturl/new").url_form
+        label.form_label http(s)://
+        input(type="text", pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" placeholder="your url here...", name='url', id='url', oninvalid="this.setCustomValidity('Incorrect URL')", required).form-control
+        button.btn Add  
