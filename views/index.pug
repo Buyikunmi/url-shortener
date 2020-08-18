@@ -1,11 +1,10 @@
 extends layout
 
 block content
-  center
-    h1= title
-    p URL Shortener Microservice
+  center   
+    h1.project-title= title
     hr
-    form(method="POST" , action="api/shorturl/new").url_form
-        label.form_label http(s)://
-        input(type="text", pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" placeholder="your url here...", name='url', id='url', oninvalid="this.setCustomValidity('Incorrect URL')", required).form-control
-        button.btn Add  
+    div.form-container
+      form(method="POST" , action="api/shorturl/new").url_form
+          input(type="url", placeholder="your url here...", name='url', id='url', oninvalid="this.setCustomValidity('Incorrect URL')", required).form-input
+          button.form-button Shorten

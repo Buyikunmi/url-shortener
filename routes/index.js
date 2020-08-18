@@ -1,58 +1,81 @@
 var express = require("express");
-var url = require("url");
-var dns = require("dns");
+var validUrl = require("valid-url");
 var router = express.Router();
 var store = [];
 
-// Check if the URL exists
-const isValid = x => {
-  let hostname = url.parse(x).hostname;
-  dns.lookup(hostname, (err, address) => {
-    if (address) {
-      return x;
-    } else {
-      return null;
-    }
-  });
-};
-// function isValidUrl(req, res, next) {
-//   let { url } = req.body;
-//   if (!isValid(url)) {
-//     let error = "Url does not exist";
-//     res.json({ error });
+// // Check if the URL exists
+// // step I : extract the hostname from the long url
+// function extractHostname(url) {
+//   var hostname;
+//   //find & remove protocol (http, ftp, etc.) and get hostname
+
+//   if (url.indexOf("//") > -1) {
+//     hostname = url.split("/")[2];
 //   } else {
-//     next();
+//     hostname = url.split("/")[0];
 //   }
+
+//   //find & remove port number
+//   hostname = hostname.split(":")[0];
+//   //find & remove "?"
+//   hostname = hostname.split("?")[0];
+//   console.log(`\n\n\nThe hostname for DNS lookup is : ${hostname}\n`);
+//   return hostname;
+// }
+// // step II : DNS lookup
+
+// function validateURL(url) {
+//   const hostName = extractHostname(url);
+//   dns.lookup(hostName, (err, address) => {
+//     if (err) {
+//       console.log(`\n\nan error occurred. \n Error Details : \n ${err}`);
+//       console.log(err == true);
+//       return false;
+//     }
+
+//     console.log(`\nThe hostname is valid, the IP address is : ${address}`);
+//     return true;
+//   });\
 // }
 
-/* GET home page. */
-router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express", store });
+router.get("/store", function (req, res, next) {
+  res.json({ store });
 });
 
-router.post("/api/shorturl/new", function(req, res, next) {
-  var url = isValid(req.body.url);
-  // if (!isValid(url)) {
-  //   let error = "Url does not exist!";
-  //   res.json({ error });
-  // } else {
-  if (url == null) {
-    let error = "Url does not exist!";
-    res.json({ error });
-  } else {
-    store.push(url);
-    let toStore = { "original url": url, "short url": store.length };
+/* GET home page. */
+router.get("/", function (req, res, next) {
+  res.render("index", { title: "URL shortener API", store });
+});
+
+router.post("/api/shorturl/new", function (req, res, next) {
+  let { url } = req.body;
+  // console.log(`URL validation details : ${url}`);
+  if (validUrl.isUri(url)) {
+    console.log("valid url");
+    if (store.indexOf(url) > -1) {
+      var toStore = {
+        "original url": url,
+        "short url": store.indexOf(url) + 1,
+      };
+    } else {
+      store.push(url);
+      var toStore = { "original url": url, "short url": store.length };
+    }
     res.json(toStore);
+  } else {
+    console.log("invalid url");
+    let error = "The url is invalid";
+    res.json({ error });
   }
 });
 
-router.get("/api/shorturl/:id", function(req, res, next) {
+router.get("/api/shorturl/:id", function (req, res, next) {
   let { id } = req.params;
   let url = store[id - 1] || "/api/error";
-  res.redirect(301, url);
+  res.json({ url }).redirect(301, url);
 });
 
-router.get("/api/error", function(req, res, next) {
+router.get("/api/error", function (req, res, next) {
   let error = "Invalid url";
   res.json({ error });
 });
