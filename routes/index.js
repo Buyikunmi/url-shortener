@@ -72,7 +72,7 @@ router.post("/api/shorturl/new", function (req, res, next) {
 router.get("/api/shorturl/:id", function (req, res, next) {
   let { id } = req.params;
   let url = store[id - 1] || "/api/error";
-  res.json({ url }).redirect(301, url);
+  res.redirect(301, url);
 });
 
 router.get("/api/error", function (req, res, next) {
